@@ -24,9 +24,10 @@ Same api as concurrent.futures.ThreadPoolExecutor , with some more control funct
 ##### set_daemon_opts(min_workers = None, max_workers = None, keep_alive_time = None)
     
 &emsp;&emsp;&emsp; In order to guarantee same api interface , new features should be modfied after object created.  
-&emsp;&emsp;&emsp; Could change minimum/maximum activate worker num , and set after how many seconds will the idle thread terminated.  
-&emsp;&emsp;&emsp; By default , min_workers = 4 , max_workers = 16 times cpu_core count on windows and 32x on linux , keep_alive_time = 100s.
-
+&emsp;&emsp;&emsp; Could change minimum/maximum activate worker num , and set after how many seconds will the  
+&emsp;&emsp;&emsp; idle thread terminated.   
+&emsp;&emsp;&emsp; By default , min_workers = 4 , max_workers = 16 times cpu_core count on windows and 32x on  
+&emsp;&emsp;&emsp; linux , keep_alive_time = 100s. 
 
 ## Example
 
