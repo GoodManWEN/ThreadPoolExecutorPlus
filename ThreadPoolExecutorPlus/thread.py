@@ -164,12 +164,14 @@ class ThreadPoolExecutor(_base.Executor):
             initializer: An callable used to initialize worker threads.
             initargs: A tuple of arguments to pass to the initializer.
         """
+        self._min_workers = 4
+        self._keep_alive_time = 100
         if max_workers is None:
             # Use this number because ThreadPoolExecutor is often
             # used to overlap I/O instead of CPU work.
             max_workers = DEFAULT_MAXIMUM_WORKER_NUM
-        if max_workers <= 0:
-            raise ValueError("max_workers must be greater than 0")
+        if max_workers <= self._min_workers:
+            raise ValueError(f"max_workers must be greater than min_workers = {self._min_workers}")
 
         if initializer is not None and not callable(initializer):
             raise TypeError("initializer must be a callable")
@@ -186,12 +188,10 @@ class ThreadPoolExecutor(_base.Executor):
                                     ("ThreadPoolExecutor-%d" % self._counter()))
         self._initializer = initializer
         self._initargs = initargs
-        self._min_workers = 4
-        self._keep_alive_time = 100
 
     def set_daemon_opts(self , min_workers = None, max_workers = None, keep_alive_time = None):
-        if min_workers is not None and min_workers < 1:
-            raise ValueError('min_workers is not allowed to set below 1')
+        if min_workers is not None and min_workers < 2:
+            raise ValueError('min_workers is not allowed to set below 2')
         if max_workers is not None and max_workers < min_workers:
             raise ValueError('max_workers is not allowed to set below min_workers')
         if min_workers is not None:
@@ -228,7 +228,7 @@ class ThreadPoolExecutor(_base.Executor):
         # TODO(bquinlan): Should avoid creating new threads if there are more
         # idle threads than items in the work queue.
         num_threads = len(self._threads)
-        if self._free_thread_count <= self._min_workers and num_threads < self._max_workers:
+        if self._free_thread_count < self._min_workers and num_threads < self._max_workers:
             thread_name = '%s_%d' % (self._thread_name_prefix or self,
                                      num_threads)
             t = _CustomThread(name=thread_name, 
