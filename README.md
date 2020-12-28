@@ -12,7 +12,7 @@ The reason why this pack exists is we would like to solve several specific pain 
 ## Feature
 - Fully replaceable with concurrent.futures.ThreadPoolExecutor , for example in asyncio.
 - Whenever submit a new task , executor will perfer to use existing idle thread rather than create a new one.
-- Executor will automatically shrink itself duriung leisure time in order to achieve less memory and higher efficiency.
+- Executor will automatically shrink itself duriung leisure time in order to achieve higher efficiency and less memory.
 
 ## Install
 
@@ -66,7 +66,6 @@ Same code in offcial doc [#executing-code-in-thread-or-process-pools](https://do
 ```Python3
 # Runs on python version above 3.7
 import asyncio
-import concurrent.futures
 import ThreadPoolExecutorPlus
 
 def blocking_io():
