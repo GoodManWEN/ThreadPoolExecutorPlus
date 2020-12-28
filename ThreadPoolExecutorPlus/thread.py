@@ -103,13 +103,13 @@ class _CustomThread(threading.Thread):
                 try:
                     work_item = self._work_queue.get(block=True , timeout = self._keep_alive_time)
                 except queue.Empty:
-                    if self._executor._free_thread_count > self._executor._min_workers:
-                        # Got lock problem here , may cause dead lock slightly chance , don't know how to fix it.
-                        self._executor._adjust_free_thread_count(-1)
-                        self._executor._remove_thread(self)
-                        break
-                    else:
-                        continue
+                    # Got lock problem here , may cause dead lock slightly chance , don't know how to fix it.
+                    with self._executor_free_thread_count_lock:
+                        if self._executor._free_thread_count > self._executor._min_workers:
+                            self._executor._free_thread_count -= 1
+                            break
+                        else:
+                            continue
 
                 if work_item is not None:
                     self._executor._adjust_free_thread_count(-1)
