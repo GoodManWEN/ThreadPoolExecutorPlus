@@ -70,6 +70,6 @@ setup(
         'Operating System :: POSIX :: Linux',
         'Operating System :: Microsoft :: Windows',
     ],
-    python_requires='>=3.4',
+    python_requires='>=3.6',
     keywords=["concurrent.futures" , "threading" , "multi-threads" ,"ThreadPoolExecutor"]
 )
