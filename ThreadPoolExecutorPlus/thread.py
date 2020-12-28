@@ -104,7 +104,7 @@ class _CustomThread(threading.Thread):
                     work_item = self._work_queue.get(block=True , timeout = self._keep_alive_time)
                 except queue.Empty:
                     # Got lock problem here , may cause dead lock slightly chance , don't know how to fix it.
-                    with self._executor_free_thread_count_lock:
+                    with self._executor._free_thread_count_lock:
                         if self._executor._free_thread_count > self._executor._min_workers:
                             self._executor._free_thread_count -= 1
                             break
