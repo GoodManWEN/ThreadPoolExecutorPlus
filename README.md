@@ -89,6 +89,47 @@ asyncio.run(main())
 Feature demo:
 ```Python3
 # feature_demo.py
+from ThreadPoolExecutorPlus import ThreadPoolExecutor
+import time , datetime
+
+def log(stmt , name = 'MAIN THREAD'):
+    print(f"[{datetime.datetime.strftime(datetime.datetime.now() , '%Y-%m-%d %H:%M:%S')}][{name}] {stmt}")
+
+def some_func(arg):
+    # does some heavy lifting
+    # outputs some results
+    log(f"New task triggered in sub thread , sleep {arg} seconds." , 'SUB THREAD ')
+    time.sleep(arg)
+    log(f"Terminated." , 'SUB THREAD ') 
+    return arg
+
+with ThreadPoolExecutor() as executor:
+    log(f"max_workers = {executor._max_workers}")
+    log(f"min_workers = {executor._min_workers}")
+    log("====================================================")
+
+    log("Reuse test:")
+    for _ in range(10):
+        executor.submit(some_func , 0.5)
+        time.sleep(1)
+        log(f"Current poll size = {len(executor._threads)}")
+
+    # Thus it perfer to reuse existing threads.
+    log("====================================================")
+
+    log("Shrink test:")
+    log("Adjust timeout time to 10 seconds.")
+    executor.set_daemon_opts(min_workers = 2 , max_workers = 10 , keep_alive_time = 10)
+    for _ in range(10):
+        executor.submit(some_func , 3)
+        time.sleep(0.01)
+    log("10 new tasks created.")
 
 
+    time.sleep(3)
+    log("All task done.")
+    
+    for _ in range(15):
+        log(f"Current poll size = {len(executor._threads)} , {_ + 1}s passed.")
+        time.sleep(1)
 ```
