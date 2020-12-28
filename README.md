@@ -21,7 +21,7 @@ The reason why this pack exists is we would like to solve several specific pain 
 ## Usage
 Same api as concurrent.futures.ThreadPoolExecutor , with some more control function added.
 
-#####set_daemon_opts(min_workers = None, max_workers = None, keep_alive_time = None)
+##### set_daemon_opts(min_workers = None, max_workers = None, keep_alive_time = None)
     In order to guarantee same api interface , new features should be modfied after object created.
     Could change minimum/maximum activate worker num , and set after how many seconds will the idle thread terminated.
     By default , min_workers = 4 , max_workers = 256 on windows and 512 on linux , keep_alive_time = 100s.
