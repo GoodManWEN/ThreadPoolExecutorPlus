@@ -7,7 +7,7 @@
 
 This package provides you a duck typing of concurrent.futures.ThreadPoolExecutor , which has the very similar api and could fully replace ThreadPoolExecutor in your code.
 
-The reason why this pack exists is we would like to solve several specific pain spot in native python one of memory control.
+The reason why this pack exists is we would like to solve several specific pain spot of memory control in native python one.
 
 ## Feature
 - Fully replaceable with concurrent.futures.ThreadPoolExecutor , for example in asyncio.
