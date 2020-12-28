@@ -80,7 +80,7 @@ class _CustomThread(threading.Thread):
     def run(self):
         if self._initializer is not None:
             try:
-                self._initializer(*initargs)
+                self._initializer(*self._initargs)
             except BaseException:
                 _base.LOGGER.critical('Exception in initializer:', exc_info=True)
                 executor = self._executor_reference()
