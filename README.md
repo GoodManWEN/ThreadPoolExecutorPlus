@@ -22,14 +22,15 @@ The reason why this pack exists is we would like to solve several specific pain 
 Same api as concurrent.futures.ThreadPoolExecutor , with some more control function added.
 
 ##### set_daemon_opts(min_workers = None, max_workers = None, keep_alive_time = None)
-    In order to guarantee same api interface , new features should be modfied after object created.
-    Could change minimum/maximum activate worker num , and set after how many seconds will the idle thread terminated.
-    By default , min_workers = 4 , max_workers = 256 on windows and 512 on linux , keep_alive_time = 100s.
+    
+&emsp;&emsp;&emsp; In order to guarantee same api interface , new features should be modfied after object created.  
+&emsp;&emsp;&emsp; Could change minimum/maximum activate worker num , and set after how many seconds will the idle thread terminated.  
+&emsp;&emsp;&emsp; By default , min_workers = 4 , max_workers = 256 on windows and 512 on linux , keep_alive_time = 100s.
 
 
 ## Example
 
-Very the same code in official doc [https://docs.python.org/3/library/concurrent.futures.html#threadpoolexecutor-example](https://docs.python.org/3/library/concurrent.futures.html#threadpoolexecutor-example) , with executor replaced:
+Very the same code in official doc [#threadpoolexecutor-example](https://docs.python.org/3/library/concurrent.futures.html#threadpoolexecutor-example) , with executor replaced:
 ```Python3
 # requests_test.py
 import concurrent.futures
@@ -47,8 +48,8 @@ def load_url(url, timeout):
         return conn.read()
 
 with ThreadPoolExecutorPlus.ThreadPoolExecutor(max_workers=5) as executor:
-	# Try modify deamon options
-	executor.set_daemon_opts(min_workers = 2 , max_workers = 10 , keep_alive_time = 60)
+    # Try modify deamon options
+    executor.set_daemon_opts(min_workers = 2 , max_workers = 10 , keep_alive_time = 60)
     future_to_url = {executor.submit(load_url, url, 60): url for url in URLS}
     for future in concurrent.futures.as_completed(future_to_url):
         url = future_to_url[future]
@@ -60,7 +61,7 @@ with ThreadPoolExecutorPlus.ThreadPoolExecutor(max_workers=5) as executor:
             print('%r page is %d bytes' % (url, len(data)))
 ```
 
-Same code in [https://docs.python.org/3/library/asyncio-eventloop.html?highlight=asyncio%20run_in_executor#executing-code-in-thread-or-process-pools](https://docs.python.org/3/library/asyncio-eventloop.html?highlight=asyncio%20run_in_executor#executing-code-in-thread-or-process-pools) with executor replaced:
+Same code in offcial doc [#executing-code-in-thread-or-process-pools](https://docs.python.org/3/library/asyncio-eventloop.html#executing-code-in-thread-or-process-pools) with executor replaced:
 ```Python3
 # Runs on python version above 3.7
 import asyncio
