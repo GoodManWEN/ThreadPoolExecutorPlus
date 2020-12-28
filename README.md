@@ -25,7 +25,7 @@ Same api as concurrent.futures.ThreadPoolExecutor , with some more control funct
     
 &emsp;&emsp;&emsp; In order to guarantee same api interface , new features should be modfied after object created.  
 &emsp;&emsp;&emsp; Could change minimum/maximum activate worker num , and set after how many seconds will the idle thread terminated.  
-&emsp;&emsp;&emsp; By default , min_workers = 4 , max_workers = 256 on windows and 512 on linux , keep_alive_time = 100s.
+&emsp;&emsp;&emsp; By default , min_workers = 4 , max_workers = 16 times cpu_core count on windows and 32x on linux , keep_alive_time = 100s.
 
 
 ## Example

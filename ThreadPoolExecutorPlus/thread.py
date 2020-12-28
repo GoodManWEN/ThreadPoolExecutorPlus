@@ -13,6 +13,15 @@ import queue
 import threading
 import weakref
 import os
+import platform
+
+pltfm = platform.system()
+if pltfm == 'Windows':
+    DEFAULT_MAXIMUM_WORKER_NUM = (os.cpu_count() or 1) * 16
+elif pltfm == 'Linux':
+    DEFAULT_MAXIMUM_WORKER_NUM = (os.cpu_count() or 1) * 32
+else:
+    raise RuntimeError("We havent decided how many threads should acquire on your platform. Maybe you have to modify source code your self.")
 
 # Workers are created as daemon threads. This is done to allow the interpreter
 # to exit when there are still idle threads in a ThreadPoolExecutor's thread
@@ -158,7 +167,7 @@ class ThreadPoolExecutor(_base.Executor):
         if max_workers is None:
             # Use this number because ThreadPoolExecutor is often
             # used to overlap I/O instead of CPU work.
-            max_workers = (os.cpu_count() or 1) * 5
+            max_workers = DEFAULT_MAXIMUM_WORKER_NUM
         if max_workers <= 0:
             raise ValueError("max_workers must be greater than 0")
 
