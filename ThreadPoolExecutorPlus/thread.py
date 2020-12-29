@@ -206,7 +206,8 @@ class ThreadPoolExecutor(_base.Executor):
             raise TypeError("initializer must be a callable")
 
         self._max_workers = max_workers
-        self._work_queue = queue.SimpleQueue(max_workers << 6)
+        # self._work_queue = queue.Queue(max_workers << 6)
+        self._work_queue = queue.SimpleQueue()
         self._threads = _CustomWeakSet()
         self._broken = False
         self._shutdown = False
