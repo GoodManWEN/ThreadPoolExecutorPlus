@@ -130,8 +130,11 @@ class _CustomThread(threading.Thread):
                     With another potential symptom is , depends on which task was last triggered by system, size of thread 
                     pool may not be precisely the same as expect just right after thread shrink happened.
                     '''
+                    if self._thread_count_id < self._executor._min_workers:
+                        continue
+
                     with self._executor._free_thread_count_lock:
-                        if self._executor._free_thread_count > self._executor._min_workers and self._thread_count_id >= self._executor._min_workers:
+                        if self._executor._free_thread_count > self._executor._min_workers:
                             self._executor._free_thread_count -= 1
                             break
                         else:
@@ -203,7 +206,7 @@ class ThreadPoolExecutor(_base.Executor):
             raise TypeError("initializer must be a callable")
 
         self._max_workers = max_workers
-        self._work_queue = queue.SimpleQueue()
+        self._work_queue = queue.SimpleQueue(max_workers << 6)
         self._threads = _CustomWeakSet()
         self._broken = False
         self._shutdown = False
@@ -221,13 +224,12 @@ class ThreadPoolExecutor(_base.Executor):
             raise ValueError('min_workers is not allowed to set below 1')
         if max_workers is not None and max_workers < min_workers:
             raise ValueError('max_workers is not allowed to set below min_workers')
-        with self._free_thread_count_lock:
-            if min_workers is not None:
-                self._min_workers = min_workers
-            if max_workers is not None:
-                self._max_workers = max_workers
-            if keep_alive_time is not None:
-                self._keep_alive_time = keep_alive_time
+        if min_workers is not None:
+            self._min_workers = min_workers
+        if max_workers is not None:
+            self._max_workers = max_workers
+        if keep_alive_time is not None:
+            self._keep_alive_time = keep_alive_time
 
     def submit(self, fn, *args, **kwargs):
         with self._shutdown_lock:
