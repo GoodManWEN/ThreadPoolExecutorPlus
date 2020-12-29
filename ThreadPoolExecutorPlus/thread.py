@@ -165,13 +165,25 @@ class _CustomThread(threading.Thread):
             _base.LOGGER.critical('Exception in worker', exc_info=True)
 
 
+
 class _CustomWeakSet(weakref.WeakSet):
 
     def __repr__(self):
         return repr(self.data)
 
 
-class BrokenThreadPool(_base.BrokenExecutor):
+class BrokenExecutor(RuntimeError):
+    """
+    Raised when a executor has become non-functional after a severe failure.
+    """
+
+# Upward Compatible
+_class_brokenexecutor = BrokenExecutor
+if 'BrokenExecutor' in dir(_base):
+    _class_brokenexecutor = _base.BrokenExecutor
+
+
+class BrokenThreadPool(_class_brokenexecutor):
     """
     Raised when a worker thread in a ThreadPoolExecutor failed initializing.
     """
