@@ -79,9 +79,12 @@ async def main():
     loop = asyncio.get_running_loop()
 
     with ThreadPoolExecutorPlus.ThreadPoolExecutor() as pool:
-        result = await loop.run_in_executor(
+        result1 = await loop.run_in_executor(
             pool, blocking_io)
-        print('custom thread pool', result)
+        result2 = await loop.run_in_executor(
+            pool, cpu_bound)
+        print('custom thread pool', result1)
+        print('custom thread pool', result2)
 
 asyncio.run(main())
 ```
