@@ -77,14 +77,14 @@ class _WorkItem(object):
 
 class _CustomThread(threading.Thread):
 
-    def __init__(self , name , executor_reference, work_queue, initializer, initargs , keep_alive_time):
+    def __init__(self , name , executor_reference, work_queue, initializer, initargs , thread_counter):
         super().__init__(name = name)
         self._executor_reference = executor_reference
         self._work_queue = work_queue
         self._initializer = initializer
         self._initargs = initargs
         self._executor = executor_reference()
-        self._keep_alive_time = keep_alive_time
+        self._thread_count_id = thread_counter
 
     def run(self):
         if self._initializer is not None:
@@ -101,11 +101,37 @@ class _CustomThread(threading.Thread):
             self._executor._adjust_free_thread_count(1)
             while True:
                 try:
-                    work_item = self._work_queue.get(block=True , timeout = self._keep_alive_time)
+                    work_item = self._work_queue.get(block=True , timeout = self._executor._keep_alive_time)
                 except queue.Empty:
-                    # Got lock problem here , may cause dead lock slightly chance , don't know how to fix it.
+                    '''
+                    A bug may cause potential risk here.
+
+                    Simply put, cause unrigister queue listening (adjust free thread count -= 1) is not atomic operation after 
+                    exception thrown, thus there's slightly chance thread swtiching (which is controled by os and not going to be 
+                    interfered by user) happens just right the time after listening stopped but before free thread count is adjusted.
+
+                    At that precisely time point , if there's a new task going to be added in main thread , determine statement  
+                    in ThreadPoolExecutor._adjust_thread_count would consider mistakenly there's still enough worker listening ,
+                    and decide not to generate a new thread. That may eventually cause a final result of task added in queue
+                    but no worker takes it out in the meantime. The last task will never run if there's no new tasks trigger ThreadPoolExecutor._adjust_thread_count afterwards.
+
+                    To fix this problem , the most reasonable , yes high cost , solution would be hacking into cpython's queue 
+                    module (which was a .pyd file projected to 'Modules/_queuemodule.c' in source code) , makes 
+                    self._executor._free_thread_count adjusted before listening suspended in interrupt of timeout's callback 
+                    functions.
+
+                    If that sounds a little bit hard to implement , the alternatively simplified approach would be preserving 
+                    serveral 'core thread' which would still looping in timeout but never halt , with the same quantity as 
+                    ThreadPoolExecutor.min_workers.
+
+                    Based on this implementation , the status refresh not in time bug will still occur whereas there's always 
+                    sub-threads working to trigger task out of task queue. This may cause sub-threads block , which was slightly
+                    out of line with expectations, at some paticular situation if existing threads occasionally full loaded.
+                    With another potential symptom is , depends on which task was last triggered by system, size of thread 
+                    pool may not be precisely the same as expect just right after thread shrink happened.
+                    '''
                     with self._executor._free_thread_count_lock:
-                        if self._executor._free_thread_count > self._executor._min_workers:
+                        if self._executor._free_thread_count > self._executor._min_workers and self._thread_count_id >= self._executor._min_workers:
                             self._executor._free_thread_count -= 1
                             break
                         else:
@@ -188,18 +214,20 @@ class ThreadPoolExecutor(_base.Executor):
                                     ("ThreadPoolExecutor-%d" % self._counter()))
         self._initializer = initializer
         self._initargs = initargs
+        self._thread_counter = 0
 
     def set_daemon_opts(self , min_workers = None, max_workers = None, keep_alive_time = None):
-        if min_workers is not None and min_workers < 2:
-            raise ValueError('min_workers is not allowed to set below 2')
+        if min_workers is not None and min_workers < 1:
+            raise ValueError('min_workers is not allowed to set below 1')
         if max_workers is not None and max_workers < min_workers:
             raise ValueError('max_workers is not allowed to set below min_workers')
-        if min_workers is not None:
-            self._min_workers = min_workers
-        if max_workers is not None:
-            self._max_workers = max_workers
-        if keep_alive_time is not None:
-            self._keep_alive_time = keep_alive_time
+        with self._free_thread_count_lock:
+            if min_workers is not None:
+                self._min_workers = min_workers
+            if max_workers is not None:
+                self._max_workers = max_workers
+            if keep_alive_time is not None:
+                self._keep_alive_time = keep_alive_time
 
     def submit(self, fn, *args, **kwargs):
         with self._shutdown_lock:
@@ -240,12 +268,13 @@ class ThreadPoolExecutor(_base.Executor):
                                work_queue = self._work_queue, 
                                initializer = self._initializer, 
                                initargs = self._initargs,
-                               keep_alive_time = self._keep_alive_time,
+                               thread_counter = self._thread_counter
                 )
             t.daemon = True
             t.start()
             self._threads.add(t)
             _threads_queues[t] = self._work_queue
+            self._thread_counter += 1
 
     def _adjust_free_thread_count(self , num):
         with self._free_thread_count_lock:
