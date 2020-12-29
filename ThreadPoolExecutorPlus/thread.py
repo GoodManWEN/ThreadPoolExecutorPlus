@@ -212,8 +212,10 @@ class ThreadPoolExecutor(_base.Executor):
             # Use this number because ThreadPoolExecutor is often
             # used to overlap I/O instead of CPU work.
             max_workers = DEFAULT_MAXIMUM_WORKER_NUM
-        if max_workers <= self._min_workers:
-            raise ValueError(f"max_workers must be greater than min_workers = {self._min_workers}")
+        if max_workers < 1:
+            raise ValueError(f"max_workers must be greater than min_workers , min_workers must be greater than 1")
+        elif 1 <= max_workers < self._min_workers:
+            self._min_workers = max_workers
 
         if initializer is not None and not callable(initializer):
             raise TypeError("initializer must be a callable")
