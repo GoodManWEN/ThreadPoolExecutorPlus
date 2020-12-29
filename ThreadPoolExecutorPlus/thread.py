@@ -23,6 +23,9 @@ elif pltfm == 'Linux':
 else:
     raise RuntimeError("We havent decided how many threads should acquire on your platform. Maybe you have to modify source code your self.")
 
+BASE_ABOVE_PY_37 = True if 'BrokenExecutor' in dir(_base) else False
+QUEUE_ABOVE_PY_37 = True if 'SipleQueue' in dir(queue) else False
+
 # Workers are created as daemon threads. This is done to allow the interpreter
 # to exit when there are still idle threads in a ThreadPoolExecutor's thread
 # pool (i.e. shutdown() was not called). However, allowing workers to die with
@@ -178,9 +181,7 @@ class BrokenExecutor(RuntimeError):
     """
 
 # Upward Compatible
-_class_brokenexecutor = BrokenExecutor
-if 'BrokenExecutor' in dir(_base):
-    _class_brokenexecutor = _base.BrokenExecutor
+_class_brokenexecutor = _base.BrokenExecutor if BASE_ABOVE_PY_37 else BrokenExecutor
 
 
 class BrokenThreadPool(_class_brokenexecutor):
@@ -218,8 +219,7 @@ class ThreadPoolExecutor(_base.Executor):
             raise TypeError("initializer must be a callable")
 
         self._max_workers = max_workers
-        # self._work_queue = queue.Queue(max_workers << 6)
-        self._work_queue = queue.SimpleQueue()
+        self._work_queue = queue.SimpleQueue() if QUEUE_ABOVE_PY_37 else queue.Queue(max_workers << 6)
         self._threads = _CustomWeakSet()
         self._broken = False
         self._shutdown = False
