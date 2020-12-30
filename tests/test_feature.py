@@ -58,7 +58,7 @@ def test_feature():
 
         list(map(lambda x:x.result() , results))
         end_time = time.time()
-        assert (_sleeptime - _inaccuracy) <= (end_time - start_time) <= (_sleeptime + _inaccuracy + _interval * _range3)
+        assert (_sleeptime - _inaccuracy) <= (end_time - start_time) <= (_sleeptime * _range3 - _inaccuracy + _interval * _range3)
 
         # test shrink
         assert len(executor._threads) == _range3
