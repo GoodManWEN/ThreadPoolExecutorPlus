@@ -5,6 +5,7 @@ from ThreadPoolExecutorPlus import *
 import concurrent.futures
 import urllib.request
 import asyncio
+import platform
 pltfm = platform.system()
 WIN_RUNNING = False
 if pltfm == 'Windows':
