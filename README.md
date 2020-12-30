@@ -111,15 +111,20 @@ with ThreadPoolExecutor() as executor:
     log(f"min_workers = {executor._min_workers}")
     log("====================================================")
 
+    # We continuously generate tasks which blocks 0.5s every 1 second.
+    # Observe its thread control behaviour.
+    # Thus find it perfer to reuse existing threads.
     log("Reuse test:")
     for _ in range(10):
         executor.submit(some_func , 0.5)
         time.sleep(1)
         log(f"Current poll size = {len(executor._threads)}")
 
-    # Thus it perfer to reuse existing threads.
     log("====================================================")
 
+    # Observe the behaviour after all task done.
+    # Controler will make fast reaction after new options set ,
+    # and automaticlly shrink no-use threads.
     log("Shrink test:")
     log("Adjust timeout time to 10 seconds.")
     executor.set_daemon_opts(min_workers = 2 , max_workers = 10 , keep_alive_time = 10)
