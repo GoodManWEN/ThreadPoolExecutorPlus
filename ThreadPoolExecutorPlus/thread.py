@@ -18,7 +18,7 @@ import platform
 pltfm = platform.system()
 if pltfm == 'Windows':
     DEFAULT_MAXIMUM_WORKER_NUM = (os.cpu_count() or 1) * 16
-elif pltfm == 'Linux':
+elif pltfm == 'Linux' or pltfm == 'Darwin':
     DEFAULT_MAXIMUM_WORKER_NUM = (os.cpu_count() or 1) * 32
 else:
     raise RuntimeError("We havent decided how many threads should acquire on your platform. Maybe you have to modify source code your self.")

@@ -40,7 +40,7 @@ async def main():
     scale_factor = 0.2
     if pltfm == 'Windows':
         max_workers = min((os.cpu_count() or 1) << 7 , 1024)
-    elif pltfm == 'Linux':
+    elif pltfm == 'Linux' or pltfm == 'Darwin':
         max_workers = min((os.cpu_count() or 1) << 8 , 4096)
     else:
         raise RuntimeError('could only run on x86 platform')
