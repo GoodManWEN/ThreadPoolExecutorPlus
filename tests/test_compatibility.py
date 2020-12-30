@@ -44,7 +44,7 @@ async def test_executing_code_in_thread_or_process_pools():
 
     def blocking_io():
         if WIN_RUNNING:
-            return
+            return b'b' * 100
         with open('/dev/urandom', 'rb') as f:
             return f.read(100)
 
