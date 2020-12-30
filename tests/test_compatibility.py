@@ -5,7 +5,10 @@ from ThreadPoolExecutorPlus import *
 import concurrent.futures
 import urllib.request
 import asyncio
-
+pltfm = platform.system()
+WIN_RUNNING = False
+if pltfm == 'Windows':
+    WIN_RUNNING = True
 
 def test_threadpoolexecutor_example():
     URLS = [
@@ -39,6 +42,8 @@ def test_threadpoolexecutor_example():
 async def test_executing_code_in_thread_or_process_pools():
 
     def blocking_io():
+        if WIN_RUNNING:
+            return
         with open('/dev/urandom', 'rb') as f:
             return f.read(100)
 
