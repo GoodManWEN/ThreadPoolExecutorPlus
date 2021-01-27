@@ -225,9 +225,9 @@ class ThreadPoolExecutor(_base.Executor):
         self._threads = _CustomWeakSet()
         self._broken = False
         self._shutdown = False
-        self._shutdown_lock = threading.Lock()
+        self._shutdown_lock = threading.RLock()
         self._free_thread_count = 0
-        self._free_thread_count_lock = threading.Lock()
+        self._free_thread_count_lock = threading.RLock()
         self._thread_name_prefix = (thread_name_prefix or
                                     ("ThreadPoolExecutor-%d" % self._counter()))
         self._initializer = initializer
