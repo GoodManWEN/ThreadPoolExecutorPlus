@@ -18,7 +18,7 @@ def get_install_requires(filename):
 
 # 
 url = 'https://github.com/GoodManWEN/ThreadPoolExecutorPlus'
-release = f'{url}/releases/latest'
+release = '{0}/releases/latest'.format(url)
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36",
     "Connection": "keep-alive",
@@ -30,8 +30,8 @@ html = BeautifulSoup(rget(url , headers).text ,'lxml')
 description = html.find('meta' ,{'name':'description'}).get('content')
 html = BeautifulSoup(rget(release , headers).text ,'lxml')
 version = html.find('div',{'class':'release-header'}).find('a').text
-logger.info(f"description: {description}")
-logger.info(f"version: {version}")
+logger.info("description: {0}".format(description))
+logger.info("version: {0}".format(version))
 
 #
 with open('README.md','r',encoding='utf-8') as f:
@@ -47,7 +47,7 @@ with open('ThreadPoolExecutorPlus/__init__.py','r',encoding='utf-8') as f:
 
 for line in init_content:
     if line == "__version__ = ''\n":
-        long_description_lines_copy.append(f"__version__ = '{version}'\n")
+        long_description_lines_copy.append("__version__ = '{0}'\n".format(version))
     else:
         long_description_lines_copy.append(line)
 
@@ -70,6 +70,6 @@ setup(
         'Operating System :: POSIX :: Linux',
         'Operating System :: Microsoft :: Windows',
     ],
-    python_requires='>=3.6',
+    python_requires='>=3.5',
     keywords=["concurrent.futures" , "threading" , "multi-threads" ,"ThreadPoolExecutor"]
 )

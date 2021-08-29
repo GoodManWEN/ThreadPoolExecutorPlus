@@ -213,7 +213,7 @@ class ThreadPoolExecutor(_base.Executor):
             # used to overlap I/O instead of CPU work.
             max_workers = DEFAULT_MAXIMUM_WORKER_NUM
         if max_workers < 1:
-            raise ValueError(f"max_workers must be greater than min_workers , min_workers must be greater than 1")
+            raise ValueError("max_workers must be greater than min_workers , min_workers must be greater than 1")
         elif 1 <= max_workers < self._min_workers:
             self._min_workers = max_workers
 

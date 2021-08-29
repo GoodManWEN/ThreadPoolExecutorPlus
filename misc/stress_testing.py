@@ -30,7 +30,7 @@ async def report_thread(executor , statistics , dataflow  , scale_factor):
     line = deque()
     while True:
         await asyncio.sleep(2)
-        print(f"Report every 2 secs : [success] {statistics[0]} \t[fail] {statistics[1]} \t[dataflow] {'%.2f' % round(dataflow[0],2)} \t[currentthread] {len(executor._threads)} \t[qps] {round((statistics[0] / (time.time() - st)) , 2)}")
+        print("Report every 2 secs : [success] {0} \t[fail] {1} \t[dataflow] {2} \t[currentthread] {3} \t[qps] {4}".format(statistics[0], statistics[1]), '%.2f' % round(dataflow[0],2), len(executor._threads), round((statistics[0] / (time.time() - st)) , 2))
 
 async def main():
     loop = asyncio.get_running_loop()
