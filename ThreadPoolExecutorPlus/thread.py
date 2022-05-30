@@ -323,3 +323,6 @@ class ThreadPoolExecutor(_base.Executor):
             for t in self._threads:
                 t.join()
     shutdown.__doc__ = _base.Executor.shutdown.__doc__
+    
+    def __del__(self):
+        self.shutdown(wait=True)
