@@ -24,7 +24,7 @@ else:
     raise RuntimeError("We havent decided how many threads should acquire on your platform. Maybe you have to modify source code your self.")
 
 BASE_ABOVE_PY_37 = True if 'BrokenExecutor' in dir(_base) else False
-QUEUE_ABOVE_PY_37 = True if 'SipleQueue' in dir(queue) else False
+QUEUE_ABOVE_PY_37 = True if 'SimpleQueue' in dir(queue) else False
 
 # Workers are created as daemon threads. This is done to allow the interpreter
 # to exit when there are still idle threads in a ThreadPoolExecutor's thread
